@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISA Draft Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-wrapper">
+    <aside>
+        <div class="brand-logo">
+            <img src="./assets/logo.png" alt="Ala-Too" width="45">
+        </div>
+        <a href="#" class="nav-item">
+            <img src="./assets/schedule.png" alt="Schedule" width="24">
+            <span>Schedule</span>
+        </a>
+        <a href="#" class="nav-item">
+            <img src="./assets/booking.png" alt="Bookings" width="24">
+            <span>Bookings</span>
+        </a>
+        <a href="#" class="nav-item">
+            <img src="./assets/exams.png" alt="Exams" width="24">
+            <span>Exams</span>
+        </a>
+        <a href="#" class="nav-item">
+            <img src="./assets/feedback.png" alt="Feedback" width="24">
+            <span>Feedback</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <img src="./assets/isa.png" alt="ISA" width="24">
+            <span>ISA</span>
+        </a>
+    </aside>
+
+    <main>
+        <header class="top-navbar">
+            <div class="nav-left">
+                <div class="header-brand">
+                    <img src="./assets/logo.png" alt="Logo" width="24">
+                    <span class="logo-text">Alatoo</span>
+                </div>
+                
+                <select class="nav-select" id="daySelect"></select>
+                
+                <select class="nav-select">
+                    <option>COMCEH-23</option>
+                    <option>COMCEH-22</option>
+                    <option>INAI-23</option>
+                    <option>INAI-24</option>
+                    <option>MAT-21</option>
+                </select>
+                
+                <select class="nav-select" id="teacherSelect">
+                    <option value="all">All Teachers</option>
+                </select>
+            </div>
+            <div class="nav-right">
+                <button class="btn-blue"><i class="fas fa-book"></i> Book</button>
+                <button class="btn-outline">EN / RU / KY</button>
+                <button class="btn-outline">Normal / A+</button>
+                <button class="btn-outline" style="color: var(--blue-primary); border-color: var(--blue-primary);">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            
+            <div class="page-header">
+                <div>
+                    <div class="page-title">
+                        <h1>Individual Schedule Arrangement (ISA) - Draft Builder</h1>
+                    </div>
+                    <!-- <div class="draft-controls">
+                        <span>My Drafts <select class="nav-select"><option>Retake Plan</option></select></span>
+                        <span class="saving-text" id="savingStatus"><i class="fas fa-check"></i> Saved</span>
+                        <span>Name this schedule: <input type="text" value="Retake Plan" class="schedule-name-input"></span>
+                    </div> -->
+                    <div class="draft-controls">
+                        <span>My Drafts 
+                            <select id="draftSelect" class="nav-select">
+                                <option value="draft_1">Retake Plan</option>
+                            </select>
+                        </span>
+                        <span class="saving-text" id="savingStatus"><i class="fas fa-check"></i> Saved</span>
+                        <span>Name this schedule: 
+                            <input type="text" id="scheduleNameInput" value="Retake Plan" class="schedule-name-input">
+                            <button id="deleteDraftBtn" class="btn-outline" style="padding: 4px 8px; color: #ef4444; border-color: #fecaca; background: #fef2f2;" title="Delete this draft">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <!-- <button class="btn-blue"><img src="./assets/stats.jpeg" width="14" style="margin-right:5px; border-radius:2px;"> Room Heatmap</button> -->
+                    <!-- <button class="btn-outline"><i class="fas fa-plus"></i> New ISA Table</button> -->
+                     <button id="newTableBtn" class="btn-outline"><i class="fas fa-plus"></i> New ISA Table</button>
+                    <button class="btn-outline" id="saveBrowserBtn"><i class="fas fa-save"></i> Save to Browser</button>
+                    <!-- <button class="btn-outline"><i class="fas fa-file-excel"></i> Excel Export</button> -->
+                </div>
+            </div>
+
+            <div class="two-columns">
+                
+                <div class="modules-panel">
+                    <div class="panel-title">Search Existing Modules</div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search subjects, e.g., Computer Networks">
+                    </div>
+                    
+                    <div class="module-list" id="moduleList"></div>
+                </div>
+
+                <div class="table-panel">
+                    <div class="panel-title">
+                        <span>My Custom ISA Table</span>
+                        <span class="grid-meta">My ISA Draft Grid <i class="fas fa-sync"></i></span>
+                    </div>
+
+                    <div class="timetable-wrapper">
+                        <div class="css-grid-table" id="timetableGrid">
+                            <div class="grid-header time-col" style="grid-area: 1 / 1;">GROUP /<br>TIME</div>
+                            <div class="grid-header" style="grid-area: 1 / 2;">Mon</div>
+                            <div class="grid-header" style="grid-area: 1 / 3;">Tue</div>
+                            <div class="grid-header" style="grid-area: 1 / 4;">Wed</div>
+                            <div class="grid-header" style="grid-area: 1 / 5;">Thu</div>
+                            <div class="grid-header" style="grid-area: 1 / 6;">Fri</div>
+
+                            <div class="time-label" style="grid-area: 2 / 1;">08:00-<br>08:40</div>
+                            <div class="time-label" style="grid-area: 3 / 1;">08:45-<br>9:25</div>
+                            <div class="time-label" style="grid-area: 4 / 1;">9:30-<br>10:10</div>
+                            <div class="time-label" style="grid-area: 5 / 1;">10:15-<br>10:55</div>
+                            <div class="time-label" style="grid-area: 6 / 1;">11:00-<br>11:40</div>
+                            <div class="time-label" style="grid-area: 7 / 1;">11:45-<br>12:25</div>
+                            <div class="time-label" style="grid-area: 8 / 1;">12:30-<br>13:10</div>
+                            <div class="time-label" style="grid-area: 9 / 1;">13:15-<br>13:55</div>
+                            <div class="time-label" style="grid-area: 10 / 1;">14:00-<br>14:40</div>
+                            <div class="time-label" style="grid-area: 11 / 1;">14:45-<br>15:25</div>
+                            <div class="time-label" style="grid-area: 12 / 1;">15:30-<br>16:10</div>
+                            <div class="time-label" style="grid-area: 13 / 1;">16:15-<br>16:55</div>
+                            <div class="time-label" style="grid-area: 14 / 1;">17:00-<br>17:40</div>
+                            <div class="time-label" style="grid-area: 15 / 1;">17:45-<br>18:25</div>
+                        </div>
+                    </div>
+
+                    <div class="notes-section">
+                        <div class="notes-title">Notes</div>
+                        <input type="text" placeholder="Add your notes about this schedule here..." class="notes-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-actions">
+                <button class="btn-clear" id="clearDraftBtn">Clear Draft</button>
+                <!-- <button class="btn-save"><i class="fas fa-cloud-upload-alt"></i> Publish Schedule</button> -->
+                <!-- <button class="btn-share"><img src="./assets/feedback.png" width="14" style="margin-right:5px; border-radius: 50%;"> Generate Shareable Link</button> -->
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

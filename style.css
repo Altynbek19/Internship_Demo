@@ -1,0 +1,605 @@
+/* ============================================================
+   ALA-TOO ISA DRAFT BUILDER - MODERN UI REDESIGN
+   ============================================================ */
+
+:root {
+    /* Новая, мягкая палитра (на основе Slate) */
+    --app-bg: #f1f5f9; /* Светлый фон */
+    --panel-bg: #ffffff;
+    --text-main: #1e293b; /* Глубокий сине-черный */
+    --text-muted: #64748b; /* Мягкий серый для деталей */
+    --border-color: #e2e8f0; /* Очень тонкие границы */
+    
+    /* Современные акцентные цвета */
+    --blue-primary: #4f46e5; /* Modern Indigo */
+    --blue-hover: #4338ca;
+    --btn-gray: #f1f5f9;
+    
+    /* Таблица */
+    --table-header-bg: #1e293b;
+    --table-header-text: #f1f5f9;
+    --table-tuesday-header: #fbbf24; /* Amber акцент для вторника */
+    --table-lines: #cbd5e1;
+    
+    /* Предметы */
+    --lab-green: #10b981; /* Emerald */
+    --lab-bg: #ecfdf5;
+    --lecture-purple: #a855f7; /* Purple */
+    --lecture-bg: #f3e8ff;
+    
+    /* Тени (Elevation) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Скругления */
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-pill: 9999px;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; /* Добавили современный Inter */
+}
+
+body { 
+    background-color: var(--app-bg); 
+    color: var(--text-main); 
+    font-size: 14px; 
+    height: 100vh; 
+    overflow: hidden; 
+    -webkit-font-smoothing: antialiased; /* Улучшение рендеринга шрифтов */
+}
+
+/* --- Layout --- */
+.app-wrapper { display: flex; height: 100vh; }
+main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* --- Sidebar (Стильный и минималистичный) --- */
+aside { 
+    width: 90px; 
+    background: #111827; /* Почти черный для контраста */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    padding: 25px 0; 
+    z-index: 10; 
+}
+.brand-logo { margin-bottom: 40px; }
+
+.nav-item { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    width: 70px; 
+    height: 70px; 
+    text-decoration: none; 
+    color: #9ca3af; 
+    font-size: 11px; 
+    margin-bottom: 10px; 
+    border-radius: var(--radius-md); 
+    transition: all 0.2s ease; 
+    font-weight: 500; 
+    position: relative;
+}
+.nav-item img { margin-bottom: 8px; filter: grayscale(100%) opacity(0.7); transition: all 0.2s; }
+
+.nav-item:hover { background-color: rgba(255,255,255,0.05); color: #fff; }
+.nav-item:hover img { filter: grayscale(0%) opacity(1); }
+
+.nav-item.active { 
+    background-color: rgba(79, 70, 229, 0.15); 
+    color: #fff; 
+}
+.nav-item.active img { filter: grayscale(0%) opacity(1); }
+/* Вертикальная полоска-индикатор */
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15px;
+    bottom: 15px;
+    width: 4px;
+    background-color: var(--blue-primary);
+    border-radius: 0 4px 4px 0;
+}
+
+/* --- Header (Чистый и с тенью) --- */
+.top-navbar { 
+    height: 65px; 
+    background: var(--panel-bg); 
+    border-bottom: 1px solid var(--border-color); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 0 30px; 
+    box-shadow: var(--shadow-sm);
+}
+.nav-left, .nav-right { display: flex; align-items: center; gap: 15px; }
+.header-brand { display: flex; align-items: center; }
+.logo-text { font-weight: 800; font-size: 20px; color: #b71c1c; letter-spacing: -0.5px; } /* Alatoo Maroon */
+
+.nav-select { 
+    padding: 8px 12px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    font-size: 12px; 
+    background-color: #f8fafc;
+    color: var(--text-main); 
+    font-weight: 500;
+    cursor: pointer; 
+    transition: border-color 0.2s;
+}
+.nav-select:hover { border-color: #cbd5e1; }
+.nav-select:focus { border-color: var(--blue-primary); outline: none; }
+
+/* Кнопки */
+.btn-blue { 
+    background: var(--blue-primary); 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    font-weight: 600;
+    display: flex; 
+    align-items: center; 
+    gap: 7px; 
+    transition: background 0.2s, transform 0.1s;
+}
+.btn-blue:hover { background: var(--blue-hover); }
+.btn-blue:active { transform: translateY(1px); }
+
+.btn-outline { 
+    background: white; 
+    border: 1px solid var(--border-color); 
+    color: var(--text-main);
+    padding: 8px 16px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-outline:hover { background: #f1f5f9; border-color: #cbd5e1; }
+
+/* Кнопка логина (синий аутлайн) */
+.btn-outline[style*="color: var(--blue-primary)"] {
+    border-color: #c7d2fe !important;
+    background-color: #eef2ff !important;
+    font-weight: 600;
+}
+.btn-outline[style*="color: var(--blue-primary)"]:hover {
+    background-color: #e0e7ff !important;
+    border-color: #a5b4fc !important;
+}
+
+/* --- Main Content Area --- */
+.content-area { 
+    padding: 30px; 
+    overflow-y: auto; 
+    height: calc(100vh - 65px); 
+}
+
+/* Page Header (Убираем рамку, делаем чище) */
+.page-header { 
+    padding: 0 0 25px 0; 
+    margin-bottom: 25px; 
+    border-bottom: 1px solid var(--border-color);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.page-title h1 { 
+    font-size: 24px; 
+    font-weight: 800; 
+    letter-spacing: -1px;
+    margin-bottom: 10px; 
+}
+.draft-controls { display: flex; align-items: center; gap: 20px; font-size: 13px; color: var(--text-muted); }
+.saving-text { display: flex; align-items: center; gap: 5px; color: #10b981; font-weight: 600; } /* Green for Saved */
+
+.schedule-name-input { 
+    border: none; 
+    border-bottom: 2px solid #cbd5e1; 
+    background: transparent; 
+    padding: 2px 0; 
+    font-weight: 600;
+    color: var(--text-main);
+    transition: border-color 0.2s;
+}
+.schedule-name-input:focus { outline: none; border-bottom-color: var(--blue-primary); }
+
+.header-actions { display: flex; gap: 10px; }
+
+/* Grid layout */
+.two-columns { 
+    display: grid; 
+    grid-template-columns: 350px 1fr; /* Чуть шире левая панель */
+    gap: 30px; 
+    align-items: start; 
+}
+
+/* Панели (Белые, с тенью, скругленные) */
+.modules-panel, .table-panel { 
+    background: var(--panel-bg); 
+    border-radius: var(--radius-lg); 
+    padding: 25px; 
+    box-shadow: var(--shadow-md); /* Глубина */
+}
+
+.panel-title { 
+    font-size: 18px; 
+    font-weight: 700; 
+    margin-bottom: 20px; 
+    letter-spacing: -0.5px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+.grid-meta { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+/* --- Search Modules Panel --- */
+.search-box { 
+    display: flex; 
+    align-items: center; 
+    border: 1px solid var(--border-color); 
+    border-radius: 10px; 
+    padding: 10px 15px; 
+    margin-bottom: 20px; 
+    background-color: #f8fafc;
+    transition: all 0.2s;
+}
+.search-box:focus-within {
+    border-color: var(--blue-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    background-color: #fff;
+}
+.search-box i { color: var(--text-muted); margin-right: 12px; font-size: 16px; }
+.search-box input { border: none; outline: none; width: 100%; font-size: 13px; background: transparent; }
+
+/* Список модулей со скроллом */
+.module-list { 
+    max-height: 100vh; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+    padding-right: 8px; /* Место для скроллбара */
+}
+
+/* Кастомный скроллбар */
+.module-list::-webkit-scrollbar { width: 5px; }
+.module-list::-webkit-scrollbar-track { background: transparent; }
+.module-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.module-list::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.day-header { 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin: 15px 0 10px 0; 
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+}
+/* Убираем верхний маргин у самого первого заголовка */
+.day-group:first-child .day-header { margin-top: 0; }
+
+.day-group { display: flex; flex-direction: column; gap: 12px; }
+
+/* Карточка предмета (Полный редизайн) */
+.module-card { 
+    border: 1px solid var(--border-color); 
+    border-radius: var(--radius-md); 
+    padding: 16px; 
+    background: #fff; 
+    transition: all 0.2s ease;
+    border-left: 0; /* Убираем толстую рамку слева */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Делаем тонкую цветную полоску вверху карточки */
+.module-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.module-card.lab::before { background-color: var(--lab-green); }
+.module-card.lecture::before { background-color: var(--lecture-purple); }
+
+.module-card:hover { 
+    border-color: #cbd5e1; 
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.subject-name { font-weight: 700; font-size: 14px; line-height: 1.3; max-width: 75%; }
+.icon-muted { color: #a1a1aa; margin-right: 7px; font-size: 13px; }
+
+/* Аккуратные бейджи-пилюли */
+.badge { 
+    font-size: 10px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    border-radius: var(--radius-pill); 
+    text-transform: uppercase; 
+}
+.badge.lab { background: var(--lab-bg); color: var(--lab-green); }
+.badge.lecture { background: var(--lecture-bg); color: var(--lecture-purple); }
+
+.card-details { color: var(--text-muted); font-size: 12px; margin-bottom: 15px; line-height: 1.6; }
+.card-details i { width: 16px; text-align: center; color: #a1a1aa; margin-right: 5px;}
+
+.btn-add { 
+    width: 100%; 
+    background: white; 
+    border: 1px solid #c7d2fe; /*Indigo-200*/
+    color: var(--blue-primary); 
+    padding: 8px; 
+    border-radius: 8px; 
+    font-size: 12px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+}
+.btn-add:hover { 
+    background: #eef2ff; 
+    border-color: #a5b4fc;
+}
+
+/* --- Timetable Grid (Чистая, профессиональная) --- */
+.timetable-wrapper { 
+    border: 1px solid var(--border-color); 
+    border-radius: var(--radius-md); 
+    overflow: hidden; 
+    box-shadow: var(--shadow-sm);
+}
+
+.css-grid-table { 
+    display: grid; 
+    grid-template-columns: 80px repeat(5, 1fr); /* Чуть шире колонка времени */
+    grid-template-rows: 50px repeat(14, 55px); /* Чуть выше ячейки */
+    background-color: var(--border-color); /* линии сетки */
+    gap: 1px; 
+}
+
+/* Шапки таблицы */
+.grid-header { 
+    background-color: #f8fafc; /* Светлый фон для шапок */
+    color: var(--text-muted); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 11px; 
+    text-transform: uppercase;
+    font-weight: 700; 
+    letter-spacing: 0.5px;
+    text-align: center; 
+}
+/* Колонка Group/Time */
+.grid-header.time-col { 
+    background-color: #f1f5f9; 
+    color: var(--text-muted); 
+    border-right: 1px solid var(--border-color);
+}
+
+/* Шапка сегодняшнего дня (Акцентная) */
+.grid-header.active-day-header { 
+    background-color: var(--table-header-bg) !important; 
+    color: #fff !important; 
+    border-bottom: 3px solid var(--table-tuesday-header) !important; 
+}
+
+/* Метки времени слева */
+.time-label { 
+    background-color: #f8fafc; 
+    color: var(--text-muted); 
+    font-size: 10px; 
+    font-weight: 600;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    line-height: 1.4;
+    border-right: 1px solid var(--border-color);
+}
+
+/* Пустые клеточки */
+.grid-cell { 
+    background-color: white; 
+}
+
+/* Подсветка ячеек сегодняшнего дня */
+.grid-cell.bg-active-day { 
+    background-color: #fffbeb !important; /* Amber-50 очень тонкий */
+}
+
+/* --- ПРЕДМЕТЫ В ТАБЛИЦЕ (Градиенты, тени, чистая типографика) --- */
+.grid-event { 
+    margin: 3px; 
+    border-radius: 6px; 
+    padding: 8px; 
+    font-size: 11px; 
+    display: flex; 
+    flex-direction: column; 
+    position: relative; 
+    z-index: 5; 
+    transition: all 0.2s; 
+    cursor: grab;
+    border: none; /* Убираем рамки */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Легкая тень */
+}
+.grid-event:hover { 
+    box-shadow: var(--shadow-md); 
+    transform: translateY(-1px); 
+    z-index: 6; /* Чтобы тень не перекрывалась */
+}
+
+/* Лабы (Зеленый градиент) */
+.event.lab { 
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); 
+    color: #065f46; /* Темный зеленый текст */
+    border-left: 3px solid var(--lab-green) !important;
+}
+
+/* Лекции (Фиолетовый градиент) */
+.event.lecture { 
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); 
+    color: #6b21a8; /* Темный фиолетовый текст */
+    border-left: 3px solid var(--lecture-purple) !important;
+}
+
+.event-top { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 5px; 
+    align-items: center; 
+}
+/* Бейджи внутри таблицы еще меньше */
+.grid-event .badge {
+    font-size: 8px;
+    padding: 2px 5px;
+}
+
+.event-title { 
+    font-weight: 700; 
+    line-height: 1.25; 
+    color: inherit; /* Использует цвет текста родителя (.lab/.lecture) */
+}
+
+.event-close { 
+    color: rgba(0,0,0,0.3); 
+    cursor: pointer; 
+    font-size: 11px; 
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0; /* Прячем, показываем при наведении */
+    transition: opacity 0.2s;
+}
+.grid-event:hover .event-close { opacity: 1; }
+.event-close:hover { color: #ef4444; }
+
+/* Иконка настроек внизу (скрыта по умолчанию) */
+.config-icon { position: absolute; bottom: 5px; right: 5px; color: rgba(0,0,0,0.1); cursor: pointer; font-size: 9px; }
+.grid-event:hover .config-icon { color: rgba(0,0,0,0.3); }
+
+/* Баннер конфликта (Красный акцент) */
+.conflict-banner { 
+    background-color: #fef2f2; 
+    border: 2px dashed #f87171; 
+    color: #b91c1c; 
+    margin: 3px; 
+    border-radius: 6px;
+    display: flex; 
+    align-items: center; 
+    padding: 0 12px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    z-index: 5; 
+}
+
+/* --- Notes & Bottom Actions --- */
+.notes-section { margin-top: 20px; }
+.notes-title { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+.notes-input { 
+    width: 100%; 
+    border: 1px solid var(--border-color); 
+    padding: 10px 15px; 
+    background-color: #f8fafc;
+    border-radius: 8px;
+    outline: none; 
+    font-size: 13px; 
+    transition: all 0.2s;
+}
+.notes-input:focus { border-color: var(--blue-primary); background-color: white; box-shadow: var(--shadow-sm); }
+
+/* Нижние кнопки */
+.bottom-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+.btn-clear { 
+    background: #fef2f2; 
+    color: #ef4444; 
+    border: 1px solid #fee2e2; 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 13px;
+    transition: all 0.2s;
+}
+.btn-clear:hover { background: #fee2e2; border-color: #fecaca; }
+
+.btn-save { padding: 10px 20px; font-size: 13px; }
+
+.btn-share { 
+    background: #ecfdf5; 
+    color: #059669; 
+    border: 1px solid #d1fae5; 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 13px;
+    display: flex; 
+    align-items: center; 
+    gap: 7px; 
+    transition: all 0.2s;
+}
+.btn-share:hover { background: #d1fae5; border-color: #a7f3d0; }
+
+/* =========================================
+   ДОПОЛНЕНИЯ: ТЕМНАЯ ТЕМА (Актуализированная)
+   ========================================= */
+
+body.dark-mode {
+    --app-bg: #0f172a; /* Slate-900 */
+    --panel-bg: #1e293b; /* Slate-800 */
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    
+    --blue-primary: #818cf8; /* Light Indigo */
+    --blue-hover: #a5b4fc;
+    --btn-gray: #334155;
+    
+    --table-header-bg: #334155;
+    --table-lines: #475569;
+}
+
+body.dark-mode aside { background: #0b1120; border-right: 1px solid #334155; }
+body.dark-mode .top-navbar { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+body.dark-mode .nav-select { background-color: #0f172a; color: #fff; }
+body.dark-mode .search-box { background-color: #0f172a; }
+body.dark-mode .search-box input { color: #fff; }
+body.dark-mode .module-card { background: transparent; }
+body.dark-mode .module-card:hover { background-color: rgba(255,255,255,0.02); }
+body.dark-mode .css-grid-table { background-color: #475569; }
+body.dark-mode .grid-header, body.dark-mode .time-label { background-color: #1e293b; color: #94a3b8; }
+body.dark-mode .grid-cell { background-color: #1e293b; }
+
+/* Подсветка в темном режиме */
+body.dark-mode .grid-cell.bg-active-day { background-color: #3f360a !important; }
+body.dark-mode .grid-header.active-day-header { border-bottom-color: #f59e0b !important; }
+
+/* Предметы в темном режиме (насыщеннее цвета) */
+body.dark-mode .event.lab { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border-color: #10b981 !important;}
+body.dark-mode .event.lecture { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border-color: #a855f7 !important;}
+body.dark-mode .event-close { color: rgba(255,255,255,0.3); }
+
+body.dark-mode .notes-input { background-color: #0f172a; color: #fff; }
+
+/* Печать без изменений */
+/* @media print { ... } */
