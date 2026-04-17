@@ -189,25 +189,24 @@ const TEACHER_CANONICAL = {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 0. ИНИЦИАЛИЗАЦИЯ ИЗ LOCAL STORAGE (МНОЖЕСТВО ТАБЛИЦ) ---
-    // Загружаем все сохраненные драфты (или создаем дефолтный)
+    // --- 0. ИНИЦИАЛИЗАЦИЯ ИЗ LOCAL STORAGE ---
     let allSchedules = JSON.parse(localStorage.getItem('isa_schedules_db')) || {
         'draft_1': { name: 'Retake Plan', subjects: [] }
     };
     let currentDraftId = localStorage.getItem('isa_current_draft') || 'draft_1';
 
-    // МИГРАЦИЯ: Если есть старые данные из предыдущей версии скрипта, переносим их
+    // МИГРАЦИЯ старых данных
     const oldSavedData = localStorage.getItem('alatoo_isa_schedule');
     if (oldSavedData && !localStorage.getItem('isa_schedules_db')) {
         allSchedules['draft_1'].subjects = JSON.parse(oldSavedData);
     }
 
-    // Рабочий массив всегда указывает на предметы текущего драфта
-    let mySchedule = allSchedules[currentDraftId].subjects;
+    // Рабочий массив. Сразу очищаем его от сломанных данных с прошлых ошибок!
+    let mySchedule = allSchedules[currentDraftId].subjects.filter(item => item && !isNaN(item.row) && !isNaN(item.span));
+    allSchedules[currentDraftId].subjects = mySchedule;
 
-    // Функция сохранения в базу браузера
     function saveToLocalStorage() {
-        allSchedules[currentDraftId].subjects = mySchedule; // Синхронизируем текущий массив с базой
+        allSchedules[currentDraftId].subjects = mySchedule; 
         localStorage.setItem('isa_schedules_db', JSON.stringify(allSchedules));
         localStorage.setItem('isa_current_draft', currentDraftId);
     }
@@ -269,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const moduleList = document.getElementById('moduleList');
     const savingStatus = document.getElementById('savingStatus');
     
-    // Элементы управления драфтами
     const draftSelect = document.getElementById('draftSelect');
     const scheduleNameInput = document.getElementById('scheduleNameInput');
     const newTableBtn = document.getElementById('newTableBtn');
@@ -292,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 groupHTML += `<div class="empty-day-text">No modules found for this day.</div>`;
             } else {
                 dayModules.forEach(mod => {
+                    // ВАЖНО: Добавили data-teacher и data-room в кнопку!
                     groupHTML += `
                         <div class="module-card ${mod.type}">
                             <div class="card-header">
@@ -302,7 +301,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div><i class="far fa-calendar-alt"></i> ${mod.timeStr}</div>
                                 <div class="teacher-name"><i class="far fa-user"></i> ${mod.teacher} | ${mod.room}</div>
                             </div>
-                            <button class="btn-add" data-id="${mod.id}" data-title="${mod.title}" data-type="${mod.type}" data-icon="${mod.icon}" data-day="${mod.day}" data-row="${mod.row}" data-span="${mod.span}">+ Add to my ISA</button>
+                            <button class="btn-add" 
+                                data-id="${mod.id}" 
+                                data-title="${mod.title}" 
+                                data-type="${mod.type}" 
+                                data-icon="${mod.icon}" 
+                                data-day="${mod.day}" 
+                                data-row="${mod.row}" 
+                                data-span="${mod.span}"
+                                data-teacher="${mod.teacher}"
+                                data-room="${mod.room}">
+                                + Add to my ISA
+                            </button>
                         </div>
                     `;
                 });
@@ -315,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attachAddListeners();
     }
 
-    // --- Отрисовка пустых ячеек (линий сетки) ---
+    // --- Отрисовка пустых ячеек ---
     function drawEmptyGrid() {
         for (let row = 2; row <= 15; row++) { 
             for (let col = 2; col <= 6; col++) {
@@ -328,7 +338,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     drawEmptyGrid();
 
-    // --- Логика отрисовки расписания ---
+    // --- УПРАВЛЕНИЕ ДРАФТАМИ (С ЗАЩИТОЙ) ---
+    function renderDraftList() {
+        if (!draftSelect) return;
+        draftSelect.innerHTML = ''; 
+        
+        if (!allSchedules[currentDraftId]) {
+            const availableDrafts = Object.keys(allSchedules);
+            if (availableDrafts.length > 0) {
+                currentDraftId = availableDrafts[0];
+            } else {
+                currentDraftId = 'draft_1';
+                allSchedules[currentDraftId] = { name: 'New Schedule', subjects: [] };
+            }
+        }
+
+        for (let id in allSchedules) {
+            if (!allSchedules[id].name) {
+                allSchedules[id].name = 'Recovered Schedule';
+            }
+            
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = allSchedules[id].name;
+            if (id === currentDraftId) option.selected = true;
+            draftSelect.appendChild(option);
+        }
+        
+        if (scheduleNameInput) {
+            scheduleNameInput.value = allSchedules[currentDraftId].name;
+        }
+    }
+
+    // --- Отрисовка сетки расписания ---
     function renderSchedule() {
         document.querySelectorAll('.grid-event, .conflict-banner').forEach(el => el.remove());
 
@@ -352,11 +394,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         attachDeleteListeners();
-        saveToLocalStorage(); // <-- Теперь сохраняет в нужный драфт!
+        saveToLocalStorage(); 
         updateButtonStates();
     }
 
-    // --- Обновление визуального статуса кнопок ---
+    // --- Обновление статуса кнопок ---
     function updateButtonStates() {
         const addButtons = document.querySelectorAll('.btn-add');
         addButtons.forEach(btn => {
@@ -380,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const addButtons = document.querySelectorAll('.btn-add');
         addButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
+                // ВАЖНО: Теперь мы собираем teacher и room
                 const data = {
                     id: btn.getAttribute('data-id'),
                     title: btn.getAttribute('data-title'),
@@ -387,7 +430,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon: btn.getAttribute('data-icon'),
                     day: parseInt(btn.getAttribute('data-day')),
                     row: parseInt(btn.getAttribute('data-row')),
-                    span: parseInt(btn.getAttribute('data-span'))
+                    span: parseInt(btn.getAttribute('data-span')),
+                    teacher: btn.getAttribute('data-teacher'),
+                    room: btn.getAttribute('data-room')
                 };
 
                 const conflict = mySchedule.find(item => {
@@ -486,66 +531,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // ЛОГИКА ДЛЯ НЕСКОЛЬКИХ ТАБЛИЦ (MY DRAFTS)
-    // ==========================================
-
-    // Функция отрисовки списка селектора
-    function renderDraftList() {
-        if (!draftSelect) return;
-        draftSelect.innerHTML = ''; 
-        for (let id in allSchedules) {
-            const option = document.createElement('option');
-            option.value = id;
-            option.textContent = allSchedules[id].name;
-            if (id === currentDraftId) option.selected = true;
-            draftSelect.appendChild(option);
-        }
-        if (scheduleNameInput) {
-            scheduleNameInput.value = allSchedules[currentDraftId].name;
-        }
-    }
-
-    // Переключение между таблицами
+    // --- События для переключения и создания Drafts ---
     if (draftSelect) {
         draftSelect.addEventListener('change', function() {
             currentDraftId = this.value; 
-            mySchedule = allSchedules[currentDraftId].subjects; // Меняем рабочий массив
+            // Фильтруем сломанные данные при загрузке
+            mySchedule = allSchedules[currentDraftId].subjects.filter(item => item && !isNaN(item.row) && !isNaN(item.span));
             
             if (scheduleNameInput) {
                 scheduleNameInput.value = allSchedules[currentDraftId].name; 
             }
             
             saveToLocalStorage();
-            renderSchedule(); // Перерисовываем таблицу с новыми данными
+            renderSchedule();
         });
     }
 
-    // Изменение имени текущей таблицы
     if (scheduleNameInput) {
         scheduleNameInput.addEventListener('input', function(e) {
             const newName = e.target.value || "Untitled Schedule";
-            
             allSchedules[currentDraftId].name = newName;
             const selectedOption = draftSelect.options[draftSelect.selectedIndex];
             if (selectedOption) selectedOption.textContent = newName;
-            
             saveToLocalStorage();
         });
     }
 
-    // Создание новой таблицы
     if (newTableBtn) {
         newTableBtn.addEventListener('click', function() {
             const newId = 'draft_' + Date.now();
             const newName = 'New Schedule';
 
-            // Создаем новый пустой объект в базе
-            allSchedules[newId] = {
-                name: newName,
-                subjects: []
-            };
-            
+            allSchedules[newId] = { name: newName, subjects: [] };
             currentDraftId = newId;
             mySchedule = allSchedules[currentDraftId].subjects;
             
@@ -555,41 +572,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // ЛОГИКА УДАЛЕНИЯ ТЕКУЩЕЙ ТАБЛИЦЫ
-    // ==========================================
+    // --- Удаление Drafts ---
     const deleteDraftBtn = document.getElementById('deleteDraftBtn');
-    
     if (deleteDraftBtn) {
         deleteDraftBtn.addEventListener('click', function() {
             const draftName = allSchedules[currentDraftId].name;
-            
-            // Запрашиваем подтверждение
             const isConfirmed = confirm(`Are you sure you want to delete "${draftName}"? \nThis action cannot be undone.`);
             
             if (isConfirmed) {
-                // Удаляем текущий драфт из базы
                 delete allSchedules[currentDraftId];
-                
-                // Проверяем, остались ли еще драфты
                 const remainingDrafts = Object.keys(allSchedules);
                 
                 if (remainingDrafts.length === 0) {
-                    // Если мы удалили последний драфт, создаем новый пустой
                     const newId = 'draft_' + Date.now();
-                    allSchedules[newId] = {
-                        name: 'New Schedule',
-                        subjects: []
-                    };
+                    allSchedules[newId] = { name: 'New Schedule', subjects: [] };
                     currentDraftId = newId;
                 } else {
-                    // Если остались другие, просто переключаемся на первый попавшийся
                     currentDraftId = remainingDrafts[0];
                 }
                 
-                // Обновляем рабочий массив и интерфейс
                 mySchedule = allSchedules[currentDraftId].subjects;
-                
                 saveToLocalStorage();
                 renderDraftList();
                 renderSchedule();
@@ -598,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- ЗАПУСК ВСЕХ ФУНКЦИЙ ---
-    renderDraftList();        // 1. Отрисовываем селектор драфтов
-    renderAvailableModules(); // 2. Отрисовываем левое меню из базы
-    renderSchedule();         // 3. Отрисовываем таблицу из памяти (текущего драфта)
+    renderDraftList();        
+    renderAvailableModules(); 
+    renderSchedule();         
 });
