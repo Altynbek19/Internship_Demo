@@ -164,6 +164,19 @@ const MODULES_DB = [
         timeStr: 'Fri 15:30-17:40',
         teacher: 'Dr. Tauheed Khan',
         room: 'LAB5(213)'
+    },
+    {
+        id: 'ai-dl-lec',
+        title: 'AI and Deep Learning',
+        type: 'lecture',
+        icon: 'fas fa-brain',
+        dayStr: 'Friday',
+        day: 6,
+        row: 12, // 15:30
+        span: 3,
+        timeStr: 'Fri 15:30-17:40',
+        teacher: 'Dr. Tauheed Khan',
+        room: 'LAB5(213)'
     }
 ];
 
@@ -330,6 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="event-close" data-id="${item.id}" title="Remove"><i class="fas fa-times"></i></span>
                 </div>
                 <div class="event-title">${item.title}</div>
+                <div class="event-teacher"><i class="far fa-user"></i> ${item.teacher}</div>
+                <div class="event-room"><i class="far fa-building"></i> ${item.room}</div>
                 <i class="fas fa-cog config-icon"></i>
             `;
             
